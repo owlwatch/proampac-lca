@@ -11,9 +11,15 @@ div.container
 				h6 Objective
 				p {{ marketDetails.Objective }}
 
-			h6 Compare 
+			h6 Compare
+	.row
+		.col-12
+			tabs
+				tab( name="tab 1")
+					p hello
+				tab( name="tab 2")
+					p Goodbye
 
-	
 </template>
 
 <!-- Script -->
@@ -21,6 +27,8 @@ div.container
 import { ref } from 'vue';
 import { useLcaStore } from '../stores/lca';
 import { storeToRefs } from 'pinia';
+import Tabs from '@/components/common/Tabs.vue';
+import Tab from '@/components/common/Tab.vue';
 
 // components
 import RadarChart from './report/Chart.vue';
