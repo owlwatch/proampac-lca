@@ -27,9 +27,10 @@
   </div>
 </template>
 
-<script>
-import expiringStorage from '../expiringStorage';
+<script lang="ts">
+import expiringStorage from '../../util/expiringStorage';
 import {reactive, provide, onMounted, toRefs} from 'vue';
+import type {TabComponentType} from '@/types/lca';
 
 export default {
   props: {

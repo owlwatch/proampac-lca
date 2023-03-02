@@ -27,8 +27,8 @@ div.container
 import { ref } from 'vue';
 import { useLcaStore } from '../stores/lca';
 import { storeToRefs } from 'pinia';
-import Tabs from '@/components/common/Tabs.vue';
-import Tab from '@/components/common/Tab.vue';
+import Tabs from './common/Tabs.vue';
+import Tab from './common/Tab.vue';
 
 // components
 import RadarChart from './report/Chart.vue';
