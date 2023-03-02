@@ -6,6 +6,7 @@ export const useLcaStore = defineStore("lca", () => {
 	const market = ref<string>('');
 	const allMarketData = ref<Array<{[key:string]:string}>>([]);
 	const allMaterials = ref<LcaDataRowList>([]);
+	const allAnalysis = ref<Array<{[key:string]:string}>>([])
 
 	const markets = computed(()=>{
 		const values: string[] = [];
@@ -24,9 +25,19 @@ export const useLcaStore = defineStore("lca", () => {
 		return allMaterials.value.filter( (row : LcaDataRow) => row['Core_Data']['Market'] == market.value) 
 	});
 
+	const analysis = computed(() => {
+		var obj:{[key:string]:{[key:string]:string}} = {};
+		allAnalysis.value.forEach( row => {
+			obj[row.Metric] = {
+				market: row[market.value],
+				overview: row.Overview
+			};
+		});
+		return obj;
+	});
+
 	const marketDetails = computed(() => {
 		return allMarketData.value.find( (row : any) => {
-			console.log(row);
 			return row['Market'] == market.value
 		});
 	});
@@ -86,29 +97,45 @@ export const useLcaStore = defineStore("lca", () => {
 		});
 	}
 
+	function parseAnalysis(rows: Array<Array<string>> ){
+
+		allAnalysis.value = [];
+
+		const headers = rows.shift();
+		if( !headers ){
+			return [];
+		}
+		allAnalysis.value = rows.map( row => {
+			const obj: {[key:string]:string} = {};
+			headers.forEach( (h:string, i:number) => {
+				obj[h] = row[i];
+			});
+			return obj;
+		});
+	}
+
 	async function loadLcaData(sheetId: string, apiKey: string) {
-		const dataSheetName = 'Materials Data';
+		
 		const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchGet`;
 		try {
 			// lets load the google sheet json
 			const data = await fetch(url + '?' + [
 				"key=" + apiKey,
-				"ranges=" + dataSheetName,
-				"ranges=Markets"
+				"ranges=" + encodeURIComponent('Materials Data'),
+				"ranges=" + encodeURIComponent('Markets'),
+				"ranges=" + encodeURIComponent('In Depth Analysis')
 			].join('&'));
 
 			const json = await data.json();
 
 			parseMaterialsJson(json.valueRanges[0].values);
 			parseMarketsJson(json.valueRanges[1].values);
-
-			console.log( allMarketData );
-			console.log( allMaterials );
-
+			parseAnalysis( json.valueRanges[2].values );
+			
 			if( markets.value.length ){
-				console.log(markets.value[0]);
 				market.value = markets.value[0];
 			}
+
 		}catch(e){
 			console.log(e);
 		}
@@ -116,10 +143,12 @@ export const useLcaStore = defineStore("lca", () => {
 
 	return { 
 		market,
-		allMaterials, 
+		allMaterials,
+		allAnalysis,
 		materials,
 		markets,
 		marketDetails,
-		loadLcaData
+		loadLcaData,
+		analysis
 	};
 });

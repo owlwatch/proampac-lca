@@ -8,33 +8,98 @@ div.container
 			div.mb-4(
 				v-if="marketDetails && marketDetails.Objective"
 			)
-				h6 Objective
+				h6.lca-heading Objective
 				p {{ marketDetails.Objective }}
 
-			h6 Compare
-	.row
-		.col-12
-			tabs
-				tab( name="tab 1")
-					p hello
-				tab( name="tab 2")
-					p Goodbye
+			h6.lca-heading Compare
+.row
+	.col-12
+		.container.my-5.small-container
+			h2.text-light-emphasis In-depth Analysis
+			p.text-light-emphasis Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed efficitur odio vitae aliquam suscipit. Praesent et ante molestie, mattis mauris nec, hendrerit justo. Mauris augue libero, congue nec purus in, egestas ullamcorper est.
+		.tabs
+			ul.nav.nav-tabs.report-tabs
+				li.nav-item(
+					v-for="tab in tabs"
+				)
+					a.nav-link(
+						:class="{'active': activeTab == tab.key}"
+						:href="`#${tab.key}`"
+						@click.prevent="activeTab = tab.key"
+					)
+						component( :is="tab.icon")
+						span(v-html="tab.titleHTML")
+		.lca-tab-content.pt-4.pb-6
+			.container(
+				v-if="currentTab.content"
+			)
+				component( :is="currentTab.content" :tab="currentTab" )
+
+						
 
 </template>
 
 <!-- Script -->
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, shallowRef, computed } from 'vue';
 import { useLcaStore } from '../stores/lca';
 import { storeToRefs } from 'pinia';
-import Tabs from './common/Tabs.vue';
-import Tab from './common/Tab.vue';
+
+
+// Icons
+import IconFossilFuel from './icons/IconFossilFuel.vue';
+import IconFreshwaterEutrophication from './icons/IconFreshwaterEutrophication.vue';
+import IconGhg from './icons/IconGhg.vue';
+import IconWaterUse from './icons/IconWaterUse.vue';
+
+// Tab Content
+import TabFossilFuel from './report/TabFossilFuel.vue';
+import TabFreshwaterEutrophication from './report/TabFreshwaterEutrophication.vue';
+import TabGhg from './report/TabGhg.vue';
+import TabWaterUse from './report/TabWaterUse.vue';
 
 // components
 import RadarChart from './report/Chart.vue';
 
 const store = useLcaStore();
 const { markets, market, materials, marketDetails } = storeToRefs(store);
+
+const activeTab = ref('fossil-fuel');
+
+const currentTab = computed(()=>{
+	return tabs.find( tab => tab.key == activeTab.value );
+});
+
+const tabs = [
+	{
+		"key": 'fossil-fuel',
+		"title": "Fossil Fuel Usage",
+		"titleHTML": "Fossil Fuel<br />Use",
+		"icon": IconFossilFuel,
+		"content": TabFossilFuel
+	},
+	{
+		"key": 'ghg',
+		"title": "Greenhouse Gas Emissions",
+		"titleHTML": "Greenhouse Gas<br />Emissions",
+		"icon": IconGhg,
+		"content": TabGhg
+	},
+	{
+		"key": 'water-use',
+		"title": "Water Use",
+		"titleHTML": "Water<br /> Use",
+		"icon": IconWaterUse,
+		"content": TabWaterUse
+	},
+	{
+		"key": 'freshwater-eutrophication',
+		"title": "Freshwater Eutrophication",
+		"titleHTML": "Freshwater<br />Eutrophication",
+		"icon": IconFreshwaterEutrophication,
+		"content": TabFreshwaterEutrophication
+	}
+]
 
 const props = defineProps<{
 	googleSheetId?: string
@@ -43,16 +108,89 @@ const props = defineProps<{
 
 store.loadLcaData( String(props.googleSheetId), String(props.googleApiKey));
 
-
-
 </script>
 
 <!-- SCSS Style -->
-<style lang="scss" scoped>
-h6 {
+<!-- not scoped -->
+<style lang="scss">
+.lca-heading {
 	text-transform: uppercase;
 	color: #A8A8AB;
 	margin-bottom: 0.5em;
-	
+	letter-spacing: 0.02em;
+	font-weight: 600;
+}
+</style>
+
+<!-- scoped -->
+<style lang="scss" scoped>
+
+h2 {
+	color: #A8A8AB;
+}
+.report-tabs {
+	display: flex;
+	justify-content: center;
+	border-bottom: 10px solid #F8F8F8;
+	.nav-item {
+		max-width: 25%;
+		width: 12em;
+		text-align: center;
+		a.nav-link {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+			border-width: 0!important;
+			position: relative;
+			&:after {
+				position: absolute;
+				top: 100%;
+				left: 0;
+				width: 100%;
+				height: 10px !important;
+				background-color: transparent !important;
+				content: '';
+				display: block;
+				transition: 0.2s all;
+			}
+			&.active {
+				border: 0;
+				position: relative;
+				&:after {
+					background-color: #A8A8AB !important;
+				}
+				&:deep(path) {
+					fill: #000 !important;
+				}
+			}
+
+			svg {
+				display: block;
+				margin: 0 auto;
+				max-width: 100%;
+				margin-bottom: 1em;
+				&:deep(path) {
+					transition: 0.2s all;
+					fill: #A8A8AB !important;
+				}
+			}
+			span {
+				flex: 1;
+				line-height: 1.4;
+				text-align: center;
+				text-transform: uppercase;
+				font-size: 1rem;
+				font-weight: 700;
+				color: #000;
+				padding-bottom: 0.75em;
+			}
+		}
+	}
+}
+.tab-content {
+	background-color: #fff;
+}
+.small-container {
+	max-width: 1020px;
 }
 </style>

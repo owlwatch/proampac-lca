@@ -4,7 +4,7 @@ import { createPinia, setActivePinia } from 'pinia';
 import { createApp } from 'vue';
 
 const pinia = createPinia();
-setActivePinia(pinia);
+// setActivePinia(pinia)
 
 // force these for debugging
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -13,10 +13,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
 		switch( (el as HTMLElement).dataset.proampacComponent ){
 			case 'proampac-lca-selector':
 				createApp(Selector)
+					.use(pinia)
 					.mount(el);
 				break;
 			case 'proampac-lca-report':
-				createApp(Report, (el as HTMLElement).dataset).mount(el);
+				createApp(Report, (el as HTMLElement).dataset)
+					.use(pinia)
+					.mount(el);
 				break;
 		}
 	});
