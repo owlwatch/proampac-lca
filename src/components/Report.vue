@@ -57,6 +57,7 @@ import TabFossilFuel from './report/TabFossilFuel.vue';
 import TabFreshwaterEutrophication from './report/TabFreshwaterEutrophication.vue';
 import TabGhg from './report/TabGhg.vue';
 import TabWaterUse from './report/TabWaterUse.vue';
+import TabContent from './report/TabContent.vue';
 
 // components
 import RadarChart from './report/Chart.vue';
@@ -76,7 +77,7 @@ const tabs = [
 		"title": "Fossil Fuel Usage",
 		"titleHTML": "Fossil Fuel<br />Use",
 		"icon": IconFossilFuel,
-		"content": TabFossilFuel
+		"content": TabContent
 	},
 	{
 		"key": 'ghg',
@@ -113,6 +114,7 @@ store.loadLcaData( String(props.googleSheetId), String(props.googleApiKey));
 <!-- SCSS Style -->
 <!-- not scoped -->
 <style lang="scss">
+
 .lca-heading {
 	text-transform: uppercase;
 	color: #A8A8AB;
@@ -142,6 +144,7 @@ h2 {
 			height: 100%;
 			border-width: 0!important;
 			position: relative;
+			color: #a8a8ab;
 			&:after {
 				position: absolute;
 				top: 100%;
@@ -151,7 +154,18 @@ h2 {
 				background-color: transparent !important;
 				content: '';
 				display: block;
-				transition: 0.2s all;
+				transition: 0.5s all;
+			}
+			&:hover, &:focus {
+				border: 0;
+				position: relative;
+				color: var(--blue);
+				&:after {
+					background-color: currentColor !important;
+				}
+				&:deep(path) {
+					fill: currentColor !important;
+				}
 			}
 			&.active {
 				border: 0;
@@ -161,6 +175,9 @@ h2 {
 				}
 				&:deep(path) {
 					fill: #000 !important;
+				}
+				span {
+					color: #000;
 				}
 			}
 
@@ -181,7 +198,7 @@ h2 {
 				text-transform: uppercase;
 				font-size: 1rem;
 				font-weight: 700;
-				color: #000;
+				color: currentColor;
 				padding-bottom: 0.75em;
 			}
 		}

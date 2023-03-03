@@ -1,10 +1,20 @@
 <template lang="pug">
-.row(
+.row.text-start(
     v-if="analysis && analysis[tab.title]"
 )
-    .col-md-6.text-start
-        h6.lca-heading Overview
+    .col-md-6
+        h6.lca-heading {{ tab.title }} Overview
         p {{ analysis[tab.title].overview }}
+
+    .col-md-6
+        .row
+            .col-auto
+                .doughnut
+                    p doughnut
+            
+            .col
+                p Selector 
+
 
     
 
@@ -23,3 +33,9 @@ const props = defineProps<{
 const {tab} = toRefs(props);
 const {analysis} = storeToRefs(store);
 </script>
+
+<style lang="scss" scoped>
+.doughnut {
+    width: 200px;
+}
+</style>
