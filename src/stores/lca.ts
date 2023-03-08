@@ -1,9 +1,10 @@
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
 import type { LcaDataRow, LcaDataRowList } from "@/types/lca";
 
 export const useLcaStore = defineStore("lca", () => {
 	const market = ref<string>('');
+	const material = ref<LcaDataRow>();
 	const allMarketData = ref<Array<{[key:string]:string}>>([]);
 	const allMaterials = ref<LcaDataRowList>([]);
 	const allAnalysis = ref<Array<{[key:string]:string}>>([])
@@ -19,10 +20,39 @@ export const useLcaStore = defineStore("lca", () => {
 			}
 		});
 		return values;
-	})
+	});
 
 	const materials = computed(() => {
-		return allMaterials.value.filter( (row : LcaDataRow) => row['Core_Data']['Market'] == market.value) 
+
+		const colors: Array<string> = [
+			'#E77724',
+			'#78BE43',
+			'#02A9E0',
+			'#CC8899'
+		];
+
+		return allMaterials.value.filter( 
+			(row : LcaDataRow) => row['Core_Data']['Market'] == market.value
+		).map(
+			(row : LcaDataRow, i: number) => {
+				row.display = {color: colors[i%colors.length]};
+				return row;
+			}
+		)
+	});
+
+	const materialsForComparison = computed(() => {
+		return materials.value.filter( material => {
+			return Number(material.Core_Data.Rank) !== -1;
+		});
+	});
+
+	const baselineMaterial = computed(() => {
+		return materials.value.filter( material => {
+			return Number(material.Core_Data.Rank) !== -1;
+		}).sort( (a,b) => {
+			return Number(a.Core_Data.Rank) - Number(b.Core_Data.Rank);
+		}).shift();
 	});
 
 	const analysis = computed(() => {
@@ -64,7 +94,7 @@ export const useLcaStore = defineStore("lca", () => {
 			}
 			else {
 				const obj:{[key:string]:{[key:string]: string}} = {};
-				row.forEach( (str, i:number) => {
+				row.forEach( (str:string, i:number) => {
 					// find the object name
 					const h1Index : number = Math.min(i, (h1.length-1));
 					const objName : string = h1[h1Index].replace(/\s/, '_');
@@ -141,11 +171,22 @@ export const useLcaStore = defineStore("lca", () => {
 		}
 	};
 
+	watch( market, (v) => {
+		// set the material to the first one
+		if( materials.value.length ){
+			material.value = materialsForComparison.value[materialsForComparison.value.length-1];
+		}
+	});
+	
+
 	return { 
 		market,
+		material,
+		baselineMaterial,
 		allMaterials,
 		allAnalysis,
 		materials,
+		materialsForComparison,
 		markets,
 		marketDetails,
 		loadLcaData,

@@ -1,7 +1,7 @@
 <!-- Pug Template -->
 <template lang="pug">
 div.container
-	.row
+	.row.g-5
 		.col-sm-12.col-md-6.d-flex.align-items-center.justify-content-center
 			radar-chart
 		.col-sm-12.col-md-6.text-start.align-items-start.justify-content-start
@@ -12,6 +12,23 @@ div.container
 				p {{ marketDetails.Objective }}
 
 			h6.lca-heading Compare
+
+			ul.list-unstyled
+				li.d-flex.align-items-start.my-2(
+					style="line-height: 1.25"
+					v-for="material in materialsForComparison"
+				)
+					icon-circle(
+						:style="{marginRight: '10px', marginTop: '0.15em'}"
+						:color="material.display.color"
+						size="1em"
+					)
+					div
+						div {{ material.Core_Data.Material }}
+						div.small.text-muted.mt-1 {{  material.Optional_Data["Description Summary"] }}
+
+			// additional stats
+			stats-section
 .row
 	.col-12
 		.container.my-5.small-container
@@ -29,7 +46,7 @@ div.container
 					)
 						component( :is="tab.icon")
 						span(v-html="tab.titleHTML")
-		.lca-tab-content.pt-4.pb-6
+		.lca-tab-content.pt-5.pb-5
 			.container(
 				v-if="currentTab.content"
 			)
@@ -51,6 +68,7 @@ import IconFossilFuel from './icons/IconFossilFuel.vue';
 import IconFreshwaterEutrophication from './icons/IconFreshwaterEutrophication.vue';
 import IconGhg from './icons/IconGhg.vue';
 import IconWaterUse from './icons/IconWaterUse.vue';
+import IconCircle from './icons/IconCircle.vue';
 
 // Tab Content
 import TabFossilFuel from './report/TabFossilFuel.vue';
@@ -59,11 +77,13 @@ import TabGhg from './report/TabGhg.vue';
 import TabWaterUse from './report/TabWaterUse.vue';
 import TabContent from './report/TabContent.vue';
 
+import StatsSection from './report/StatsSection.vue';
+
 // components
 import RadarChart from './report/Chart.vue';
 
 const store = useLcaStore();
-const { markets, market, materials, marketDetails } = storeToRefs(store);
+const { markets, market, materials, marketDetails, materialsForComparison } = storeToRefs(store);
 
 const activeTab = ref('fossil-fuel');
 
@@ -84,21 +104,21 @@ const tabs = [
 		"title": "Greenhouse Gas Emissions",
 		"titleHTML": "Greenhouse Gas<br />Emissions",
 		"icon": IconGhg,
-		"content": TabGhg
+		"content": TabContent
 	},
 	{
 		"key": 'water-use',
 		"title": "Water Use",
 		"titleHTML": "Water<br /> Use",
 		"icon": IconWaterUse,
-		"content": TabWaterUse
+		"content": TabContent
 	},
 	{
 		"key": 'freshwater-eutrophication',
 		"title": "Freshwater Eutrophication",
 		"titleHTML": "Freshwater<br />Eutrophication",
 		"icon": IconFreshwaterEutrophication,
-		"content": TabFreshwaterEutrophication
+		"content": TabContent
 	}
 ]
 
@@ -159,7 +179,7 @@ h2 {
 			&:hover, &:focus {
 				border: 0;
 				position: relative;
-				color: var(--blue);
+				color: var(--green);
 				&:after {
 					background-color: currentColor !important;
 				}

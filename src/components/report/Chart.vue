@@ -17,7 +17,11 @@ import {
   Filler,
   Tooltip,
   Legend,
-type ChartOptions
+type ChartOptions,
+type ScriptableContext,
+type ScriptableChartContext,
+Chart,
+type TooltipModel
 } from 'chart.js';
 
 import { Radar } from 'vue-chartjs'
@@ -27,6 +31,7 @@ import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import type { Tick } from 'chart.js/dist/core/core.scale';
 import type { LcaDataRow } from '@/types/lca';
+import type { CanvasFontSpec } from 'chart.js/dist/helpers/helpers.options';
 
 ChartJS.register(
 	RadialLinearScale,
@@ -39,11 +44,127 @@ ChartJS.register(
 
 const { materials } = storeToRefs( useLcaStore() );
 
+
+const getOrCreateTooltip = (chart: Chart<'radar'>) => {
+  let tooltipEl = chart.canvas.parentNode?.querySelector('div');
+
+  if (!tooltipEl) {
+    tooltipEl = document.createElement('div');
+    tooltipEl.style.background = 'rgba(0, 0, 0, 0.7)';
+    tooltipEl.style.borderRadius = '3px';
+    tooltipEl.style.color = 'white';
+    tooltipEl.style.opacity = '1';
+    tooltipEl.style.pointerEvents = 'none';
+    tooltipEl.style.position = 'absolute';
+    tooltipEl.style.transform = 'translate(-50%, 0)';
+    tooltipEl.style.transition = 'all .1s ease';
+
+    const div = document.createElement('div');
+	div.classList.add('tooltip-body');
+    
+    tooltipEl.appendChild(div);
+    chart.canvas.parentNode?.appendChild(tooltipEl);
+  }
+
+  return tooltipEl;
+};
+
+const externalTooltipHandler = (context: {chart: Chart, tooltip: TooltipModel}) => {
+  // Tooltip Element
+  const {chart, tooltip} = context;
+  const tooltipEl = getOrCreateTooltip(chart);
+
+  // Hide if no tooltip
+  if (tooltip.opacity === 0) {
+    tooltipEl.style.opacity = '0';
+    return;
+  }
+
+  const body = tooltipEl.querySelector('.tooltip-body');
+
+  if( !body ){
+	return;
+  }
+
+  body.innerHTML = '<h1>test</h1>';
+
+  const {offsetLeft: positionX, offsetTop: positionY} = chart.canvas;
+  // Set Text
+  tooltipEl.style.opacity = '1';
+  tooltipEl.style.left = positionX + tooltip.caretX + 'px';
+  tooltipEl.style.top = positionY + tooltip.caretY + 'px';
+  tooltipEl.style.font = (tooltip.options.bodyFont as CanvasFontSpec).string;
+  tooltipEl.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
+
+
+};
+
+
 const options : ChartOptions = {
 	maintainAspectRatio: true,
+	interaction : {
+		mode: 'index',
+		axis: 'xy',
+		intersect: false
+	},
 	plugins: {
 		legend: {
 			display: false
+		},
+		tooltip: {
+			// enabled: false,
+			// external: externalTooltipHandler,
+			padding: 20,
+			backgroundColor: 'rgba(255,255,255,0.95)',
+			bodyColor: 'rgba(0,0,0,1)',
+			titleColor: 'rgba(0,0,0,1)',
+			borderWidth: 1,
+			borderColor: 'rgba(0,0,0,0.2)',
+			bodySpacing: 5,
+			usePointStyle: true,
+			boxPadding: 6,
+			xAlign: (context) => {
+				if( !context.tooltipItems.length ){
+					return;
+				}
+				const label = context.tooltipItems[0].label;
+				if( label == 'GHG EMISSIONS' || label == 'FRESHWATER EUTROPHICATION' ){
+					return 'center';
+				}
+				else if( label == 'WATER USE' ){
+					return 'left';
+				}
+				else {
+					return 'right';
+				}
+			},
+			yAlign: (context) => {
+				if( !context.tooltipItems.length ){
+					return;
+				}
+				const label = context.tooltipItems[0].label;
+				if( label == 'GHG EMISSIONS' ){
+					return 'top';
+				}
+				else if( label == 'FRESHWATER EUTROPHICATION' ){
+					return 'bottom';
+				}
+				else {
+					return 'center';
+				}
+			},
+			callbacks: {
+				labelPointStyle: (context) => {
+					return {
+						pointStyle: 'circle',
+						rotation: 0
+					}
+				},
+				title: (tooltipItems ) => {
+
+					return Array.isArray(tooltipItems[0].label) ? tooltipItems[0].label.join(' ') : tooltipItems[0].label;
+				}
+			}
 		}
 	},
 	scales: {
@@ -77,8 +198,6 @@ const options : ChartOptions = {
 	}
 }
 
-const colors = ['#78BE43','#02A9E0','#E77724','#F4BE18']
-
 const data = computed( () => {
 	
 	const rows = materials.value.filter( row => {
@@ -96,17 +215,15 @@ const data = computed( () => {
 	).map( (row, index) => ({
 		label: row['Core_Data']['Material'],
 		data: labels.map(label => row['Overall_ratings'][label]),
-		backgroundColor: colors[index]+'10',
-		borderColor: colors[index]
+		backgroundColor: row.display.color+'10',
+		borderColor: row.display.color
 	}))
 	return {
-		labels: labels.map(s => s.toUpperCase().split(' ')),
+		labels: labels.map(s => s.match(/fossil/i) ? ['FOSSIL FUEL', 'USAGE'] : s.toUpperCase() ),
 		datasets
 	}
 
 });
-
-
 
 </script>
 
