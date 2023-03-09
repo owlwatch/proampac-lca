@@ -1,11 +1,7 @@
 <template lang="pug">
-tab-content(
-    v-bind="props"
-)
+tab-content
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
-    tab: {[k:string]: any}
-}>();
+import TabContent from './TabContent.vue';
 </script>

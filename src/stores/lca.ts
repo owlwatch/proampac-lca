@@ -38,21 +38,17 @@ export const useLcaStore = defineStore("lca", () => {
 				row.display = {color: colors[i%colors.length]};
 				return row;
 			}
-		)
+		).sort( (a,b) => {
+			return Number(a.Core_Data.Rank) - Number(b.Core_Data.Rank);
+		})
 	});
 
 	const materialsForComparison = computed(() => {
-		return materials.value.filter( material => {
-			return Number(material.Core_Data.Rank) !== -1;
-		});
+		return materials.value.slice(1);
 	});
 
 	const baselineMaterial = computed(() => {
-		return materials.value.filter( material => {
-			return Number(material.Core_Data.Rank) !== -1;
-		}).sort( (a,b) => {
-			return Number(a.Core_Data.Rank) - Number(b.Core_Data.Rank);
-		}).shift();
+		return materials.value[0];
 	});
 
 	const analysis = computed(() => {
@@ -94,14 +90,14 @@ export const useLcaStore = defineStore("lca", () => {
 			}
 			else {
 				const obj:{[key:string]:{[key:string]: string}} = {};
-				row.forEach( (str:string, i:number) => {
+				h2.forEach( (str:string, i:number) => {
 					// find the object name
 					const h1Index : number = Math.min(i, (h1.length-1));
 					const objName : string = h1[h1Index].replace(/\s/, '_');
 					if( !obj[objName] ){
 						obj[objName] = {};
 					}
-					obj[objName][h2[i]] = str;
+					obj[objName][h2[i]] = row[i];
 				});
 				allMaterials.value.push(obj);
 			}

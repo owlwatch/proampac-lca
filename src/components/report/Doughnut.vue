@@ -7,17 +7,18 @@
         ref="doughnutInstance"
     )
     .doughnut-title
-        .doughnut-title-percent {{ Math.round(percent) }}
+        .doughnut-title-percent {{ myPercent }}
             span.small %
         .doughnut-title-below(
-            v-if="percent > 0"
+            v-if="myPercent >= 0"
         ) reduction
 </template>
 
 <script lang="ts" setup>
-import { toRefs, watch, ref } from 'vue';
+import { toRefs, watch, ref, computed } from 'vue';
 import {
     Chart as ChartJS,
+    type ChartData,
     ArcElement,
     DoughnutController,
     type ChartOptions,
@@ -35,13 +36,20 @@ const props = withDefaults( defineProps<Props>(), {
 });
 
 const {percent} = toRefs( props );
+const myPercent = computed( () => {
+    return Math.max(0, percent.value);
+});
 
-const doughnutInstance = ref<InstanceType<typeof Doughnut>>();
+const doughnutInstance = ref();
 
-watch(percent, (value) => {
-    if( doughnutInstance.value ){
-        doughnutInstance.value.chart.update();
-    }
+watch(myPercent, (value) => {
+    data.value = {
+        labels: ['', ''],
+        datasets: [{
+            backgroundColor: ['#62BB46', 'transparent'],
+            data: [Number(value || 0), 100-value]
+        }]
+    };
 });
 
 ChartJS.register(ArcElement);
@@ -68,13 +76,13 @@ const backgroundCircle = {
     }
 }
 
-const data = {
+const data = ref<ChartData<'doughnut'>>({
     labels: ['', ''],
     datasets: [{
         backgroundColor: ['#62BB46', 'transparent'],
         data: [Number(percent.value || 0), 100-percent.value]
     }]
-};
+});
 
 const chartOptions: ChartOptions<'doughnut'>= {
     responsive: true,
@@ -82,6 +90,7 @@ const chartOptions: ChartOptions<'doughnut'>= {
     aspectRatio: 1/1,
     cutout: '65%',
     borderColor: 'transparent',
+    
     hover: {
         
     },

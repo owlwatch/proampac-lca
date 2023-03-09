@@ -16,7 +16,7 @@ div.container
 			ul.list-unstyled
 				li.d-flex.align-items-start.my-2(
 					style="line-height: 1.25"
-					v-for="material in materialsForComparison"
+					v-for="material in materials"
 				)
 					icon-circle(
 						:style="{marginRight: '10px', marginTop: '0.15em'}"
@@ -31,9 +31,11 @@ div.container
 			stats-section
 .row
 	.col-12
-		.container.my-5.small-container
-			h2.text-light-emphasis In-depth Analysis
-			p.text-light-emphasis Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed efficitur odio vitae aliquam suscipit. Praesent et ante molestie, mattis mauris nec, hendrerit justo. Mauris augue libero, congue nec purus in, egestas ullamcorper est.
+		.container.my-5
+			.row.justify-content-center
+				.col-12.col-xl-8
+					h2.text-light-emphasis In-depth Analysis
+					p.text-light-emphasis Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed efficitur odio vitae aliquam suscipit. Praesent et ante molestie, mattis mauris nec, hendrerit justo. Mauris augue libero, congue nec purus in, egestas ullamcorper est.
 		.tabs
 			ul.nav.nav-tabs.report-tabs
 				li.nav-item(
@@ -50,10 +52,7 @@ div.container
 			.container(
 				v-if="currentTab.content"
 			)
-				component( :is="currentTab.content" :tab="currentTab" )
-
-						
-
+				component( :is="currentTab.content" :tab="currentTab")
 </template>
 
 <!-- Script -->
@@ -93,23 +92,26 @@ const currentTab = computed(()=>{
 
 const tabs = [
 	{
-		"key": 'fossil-fuel',
-		"title": "Fossil Fuel Usage",
-		"titleHTML": "Fossil Fuel<br />Use",
-		"icon": IconFossilFuel,
-		"content": TabContent
-	},
-	{
 		"key": 'ghg',
 		"title": "Greenhouse Gas Emissions",
 		"titleHTML": "Greenhouse Gas<br />Emissions",
+		"comparisonString" : " emits <strong> $percent less Greenhouse Gass</strong> than the ",
 		"icon": IconGhg,
 		"content": TabContent
+	},
+	{
+		"key": 'fossil-fuel',
+		"title": "Fossil Fuel Usage",
+		"titleHTML": "Fossil Fuel<br />Use",
+		"comparisonString" : " uses <strong> $percent less fossil fuels</strong> than the ",
+		"icon": IconFossilFuel,
+		"content": TabFossilFuel
 	},
 	{
 		"key": 'water-use',
 		"title": "Water Use",
 		"titleHTML": "Water<br /> Use",
+		"comparisonString" : " uses <strong> $percent less water</strong> than the ",
 		"icon": IconWaterUse,
 		"content": TabContent
 	},
@@ -117,6 +119,7 @@ const tabs = [
 		"key": 'freshwater-eutrophication',
 		"title": "Freshwater Eutrophication",
 		"titleHTML": "Freshwater<br />Eutrophication",
+		"comparisonString" : " <strong>has $percent less impact on the freshwater supply</strong> than the ",
 		"icon": IconFreshwaterEutrophication,
 		"content": TabContent
 	}

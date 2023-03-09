@@ -21,7 +21,9 @@ type ChartOptions,
 type ScriptableContext,
 type ScriptableChartContext,
 Chart,
-type TooltipModel
+type TooltipModel,
+type DatasetChartOptions,
+type TooltipLabelStyle
 } from 'chart.js';
 
 import { Radar } from 'vue-chartjs'
@@ -102,6 +104,7 @@ const externalTooltipHandler = (context: {chart: Chart, tooltip: TooltipModel}) 
 
 const options : ChartOptions = {
 	maintainAspectRatio: true,
+	aspectRatio: 5/4,
 	interaction : {
 		mode: 'index',
 		axis: 'xy',
@@ -117,10 +120,19 @@ const options : ChartOptions = {
 			padding: 20,
 			backgroundColor: 'rgba(255,255,255,0.95)',
 			bodyColor: 'rgba(0,0,0,1)',
-			titleColor: 'rgba(0,0,0,1)',
+			titleColor: 'rgba(0,0,0,0.4)',
+			titleFont: {
+				weight: 'bold',
+				size: 14,
+			},
+			bodyFont: {
+				size: 14
+			},
+			titleMarginBottom: 10,
 			borderWidth: 1,
 			borderColor: 'rgba(0,0,0,0.2)',
-			bodySpacing: 5,
+			bodySpacing: 8,
+			cornerRadius: 10,
 			usePointStyle: true,
 			boxPadding: 6,
 			xAlign: (context) => {
@@ -128,7 +140,7 @@ const options : ChartOptions = {
 					return;
 				}
 				const label = context.tooltipItems[0].label;
-				if( label == 'GHG EMISSIONS' || label == 'FRESHWATER EUTROPHICATION' ){
+				if( label == 'GREENHOUSE GAS EMISSIONS' || label == 'FRESHWATER EUTROPHICATION' ){
 					return 'center';
 				}
 				else if( label == 'WATER USE' ){
@@ -143,7 +155,7 @@ const options : ChartOptions = {
 					return;
 				}
 				const label = context.tooltipItems[0].label;
-				if( label == 'GHG EMISSIONS' ){
+				if( label == 'GREENHOUSE GAS EMISSIONS' ){
 					return 'top';
 				}
 				else if( label == 'FRESHWATER EUTROPHICATION' ){
@@ -160,9 +172,26 @@ const options : ChartOptions = {
 						rotation: 0
 					}
 				},
+				label: (context) => {
+					return String(context.parsed.r);
+				},
+				labelColor: function(context) {
+					if( !context.dataset.borderColor ){
+						return;
+					}
+					return {
+						backgroundColor: context.dataset.borderColor,
+						borderColor: context.dataset.borderColor,
+						borderWidth: 2,
+						borderDash: [2, 2],
+						borderRadius: 2,
+					} as TooltipLabelStyle;
+				},
 				title: (tooltipItems ) => {
 
-					return Array.isArray(tooltipItems[0].label) ? tooltipItems[0].label.join(' ') : tooltipItems[0].label;
+					return (
+						Array.isArray(tooltipItems[0].label) ? tooltipItems[0].label.join(' ') : tooltipItems[0].label
+					) + ' RATING';
 				}
 			}
 		}
@@ -215,8 +244,12 @@ const data = computed( () => {
 	).map( (row, index) => ({
 		label: row['Core_Data']['Material'],
 		data: labels.map(label => row['Overall_ratings'][label]),
-		backgroundColor: row.display.color+'10',
-		borderColor: row.display.color
+		backgroundColor: row.display.color+'00',
+		borderColor: row.display.color,
+		pointBackgroundColor: (context: ScriptableContext<'doughnut'>) => {
+			return context.dataset.borderColor
+		},
+		pointRadius: 5
 	}))
 	return {
 		labels: labels.map(s => s.match(/fossil/i) ? ['FOSSIL FUEL', 'USAGE'] : s.toUpperCase() ),
