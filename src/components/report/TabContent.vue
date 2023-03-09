@@ -2,11 +2,11 @@
 .row.text-start.gx-5(
     v-if="analysis && analysis[tab.title]"
 )
-    .col-md-6
+    .col-lg-6
         h6.lca-heading {{ tab.title }} Overview
         p {{ analysis[tab.title].overview }}
 
-    .col-md-6
+    .col-lg-6.mt-4.mt-lg-0
         .row
             .col-auto
                 .doughnut

@@ -1,6 +1,6 @@
 <!-- Pug Template -->
 <template lang="pug">
-div.container
+.container.overflow-hidden
 	.row.g-5
 		.col-sm-12.col-md-6.d-flex.align-items-center.justify-content-center
 			radar-chart
@@ -29,30 +29,31 @@ div.container
 
 			// additional stats
 			stats-section
-.row
-	.col-12
-		.container.my-5
-			.row.justify-content-center
-				.col-12.col-xl-8
-					h2.text-light-emphasis In-depth Analysis
-					p.text-light-emphasis Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed efficitur odio vitae aliquam suscipit. Praesent et ante molestie, mattis mauris nec, hendrerit justo. Mauris augue libero, congue nec purus in, egestas ullamcorper est.
-		.tabs
-			ul.nav.nav-tabs.report-tabs
-				li.nav-item(
-					v-for="tab in tabs"
-				)
-					a.nav-link(
-						:class="{'active': activeTab == tab.key}"
-						:href="`#${tab.key}`"
-						@click.prevent="activeTab = tab.key"
+.overflow-hidden.w-100
+	.row
+		.col-12
+			.container.my-5
+				.row.justify-content-center
+					.col-12.col-xl-8
+						h2.text-light-emphasis In-depth Analysis
+						p.text-light-emphasis Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed efficitur odio vitae aliquam suscipit. Praesent et ante molestie, mattis mauris nec, hendrerit justo. Mauris augue libero, congue nec purus in, egestas ullamcorper est.
+			.tabs
+				ul.nav.nav-tabs.report-tabs
+					li.nav-item(
+						v-for="tab in tabs"
 					)
-						component( :is="tab.icon")
-						span(v-html="tab.titleHTML")
-		.lca-tab-content.pt-5.pb-5
-			.container(
-				v-if="currentTab.content"
-			)
-				component( :is="currentTab.content" :tab="currentTab")
+						a.nav-link(
+							:class="{'active': activeTab == tab.key}"
+							:href="`#${tab.key}`"
+							@click.prevent="activeTab = tab.key"
+						)
+							component( :is="tab.icon")
+							span(v-html="tab.titleHTML")
+			.lca-tab-content.pt-5.pb-5
+				.container(
+					v-if="currentTab.content"
+				)
+					component( :is="currentTab.content" :tab="currentTab")
 </template>
 
 <!-- Script -->
