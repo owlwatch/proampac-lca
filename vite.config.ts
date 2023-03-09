@@ -16,7 +16,7 @@ export default defineConfig({
   ],
   build: {
     lib: {
-      entry: './main.ts',
+      entry: './index.html',
       name: 'proampac-lca',
       // the proper extensions will be added
       fileName: 'proampac-lca'
