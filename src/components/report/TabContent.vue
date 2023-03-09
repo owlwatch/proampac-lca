@@ -8,13 +8,13 @@
 
     .col-lg-6.mt-4.mt-lg-0
         .row
-            .col-auto
+            .col-12.col-sm-auto.d-flex.justify-content-center
                 .doughnut
                     doughnut(
                         :percent="reduction"
                     )
             
-            .col
+            .col-12.col-sm.mt-5.mt-sm-0
                 h6.lca-heading.mb-3 Quick Comparison
                 div(
                     v-if="materialsForComparison.length > 1"

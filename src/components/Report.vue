@@ -85,7 +85,7 @@ import RadarChart from './report/Chart.vue';
 const store = useLcaStore();
 const { markets, market, materials, marketDetails, materialsForComparison } = storeToRefs(store);
 
-const activeTab = ref('fossil-fuel');
+const activeTab = ref('ghg');
 
 const currentTab = computed(()=>{
 	return tabs.find( tab => tab.key == activeTab.value );
@@ -163,6 +163,10 @@ h2 {
 		width: 12em;
 		text-align: center;
 		a.nav-link {
+			padding: 0;
+			@media( min-width: 600px ){
+				padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
+			}
 			display: flex;
 			flex-direction: column;
 			height: 100%;
@@ -208,7 +212,7 @@ h2 {
 			svg {
 				display: block;
 				margin: 0 auto;
-				max-width: 100%;
+				max-width: 80%;
 				margin-bottom: 1em;
 				&:deep(path) {
 					transition: 0.2s all;
@@ -220,8 +224,12 @@ h2 {
 				line-height: 1.4;
 				text-align: center;
 				text-transform: uppercase;
-				font-size: 1rem;
-				font-weight: 700;
+				font-size: 0.85rem;
+				font-weight: 600;
+				@media( min-width: 600px ){
+					font-size: 1rem;
+					font-weight: 700;
+				}
 				color: currentColor;
 				padding-bottom: 0.75em;
 			}
