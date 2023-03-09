@@ -76,9 +76,10 @@ const store = useLcaStore();
 const getStatPercent = function( material:any, title:string){
     const all = material[tab.value.title.replace(/\s/,'_')];
     const total = Object.keys(all).reduce( (total, v) => {
-        return total + Number(all[v].replace(/,/, ''));
+        return total + Number(all[v].replace(/[^\d\.]/gi, ''));
     }, 0);
-    return (all[title] / total) * 100;
+    const v = Number(all[title].replace(/[^\d\.]/gi, ''));
+    return (v / total) * 100;
 }
 
 const props = defineProps<{

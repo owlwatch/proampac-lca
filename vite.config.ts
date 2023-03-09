@@ -14,14 +14,6 @@ export default defineConfig({
       }
     })
   ],
-  build: {
-    lib: {
-      entry: './index.html',
-      name: 'proampac-lca',
-      // the proper extensions will be added
-      fileName: 'proampac-lca'
-    }
-  },
   define: {
     'process.env': process.env
   },

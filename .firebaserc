@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "187672119784"
-  }
+    "staging": "proampac-lca"
+  },
+  "targets": {},
+  "etags": {}
 }
