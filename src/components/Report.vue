@@ -11,7 +11,7 @@
 				h6.lca-heading Objective
 				p {{ marketDetails.Objective }}
 
-			h6.lca-heading Compare
+			h6.lca-heading Comparison
 
 			ul.list-unstyled
 				li.d-flex.align-items-start.my-2(
@@ -36,7 +36,9 @@
 				.row.justify-content-center
 					.col-12.col-xl-8
 						h2.text-light-emphasis In-depth Analysis
-						p.text-light-emphasis Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed efficitur odio vitae aliquam suscipit. Praesent et ante molestie, mattis mauris nec, hendrerit justo. Mauris augue libero, congue nec purus in, egestas ullamcorper est.
+						p.text-light-emphasis(
+							v-html="lang('In-Depth Analysis', '', true)"
+						)
 			.tabs
 				ul.nav.nav-tabs.report-tabs
 					li.nav-item(
@@ -54,10 +56,20 @@
 					v-if="currentTab.content"
 				)
 					component( :is="currentTab.content" :tab="currentTab")
+
+.container.mt-4.text-start
+	h6.disclaimer-title Disclaimer
+	.disclaimer.small.text-start(
+		style="line-height: 1.3"
+		v-html="lang('Disclaimer', '', true)"
+	)
 </template>
 
 <!-- Script -->
 <script setup lang="ts">
+
+import {marked} from 'marked';
+
 import { ref, shallowRef, computed } from 'vue';
 import { useLcaStore } from '../stores/lca';
 import { storeToRefs } from 'pinia';
@@ -80,9 +92,10 @@ import TabContent from './report/TabContent.vue';
 import StatsSection from './report/StatsSection.vue';
 
 // components
-import RadarChart from './report/Chart.vue';
+import RadarChart from './report/RadarChart.vue';
 
 const store = useLcaStore();
+const lang = store.lang;
 const { markets, market, materials, marketDetails, materialsForComparison } = storeToRefs(store);
 
 const activeTab = ref('ghg');
@@ -153,6 +166,14 @@ store.loadLcaData( String(props.googleSheetId), String(props.googleApiKey));
 
 h2 {
 	color: #A8A8AB;
+}
+
+.disclaimer {
+	color: #555;
+	&:deep(*){
+		font-size: 0.9rem;
+		line-height: 1.4em;
+	}
 }
 .report-tabs {
 	display: flex;

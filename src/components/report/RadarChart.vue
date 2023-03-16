@@ -5,6 +5,22 @@ radar(
 	:options="options"
 	:data="data"
 )
+teleport(
+	v-if="tooltipEl && tooltipContext"
+	:to="tooltipEl"
+)
+	.tooltip-body.text-start(
+		:class="{['x-'+tooltipXY[0]]: true, ['y-'+tooltipXY[1]]: true}"
+	)
+		h4 {{ tooltipContext.tooltip.title.join(' ') }}
+		table
+			tr(v-for="point in tooltipContext.tooltip.dataPoints")
+				td.d-flex.align-items-center
+					div.point-bar(
+						:style="pointBarStyle(point)"
+					)
+					div.point-label.ms-2 {{ point.formattedValue }}
+
 </template>
 
 <!-- Script -->
@@ -23,17 +39,23 @@ type ScriptableChartContext,
 Chart,
 type TooltipModel,
 type DatasetChartOptions,
-type TooltipLabelStyle
+type TooltipLabelStyle,
+type ChartData
 } from 'chart.js';
 
 import { Radar } from 'vue-chartjs'
 
 import { useLcaStore } from '../../stores/lca';
 import { storeToRefs } from 'pinia';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import type { Tick } from 'chart.js/dist/core/core.scale';
 import type { LcaDataRow } from '@/types/lca';
 import type { CanvasFontSpec } from 'chart.js/dist/helpers/helpers.options';
+
+export interface TooltipContext {
+	chart: Chart
+	tooltip: TooltipModel
+}
 
 ChartJS.register(
 	RadialLinearScale,
@@ -46,61 +68,73 @@ ChartJS.register(
 
 const { materials } = storeToRefs( useLcaStore() );
 
+const tooltipContext = ref<TooltipContext>();
+const tooltipEl = ref<HTMLDivElement>();
 
-const getOrCreateTooltip = (chart: Chart<'radar'>) => {
-  let tooltipEl = chart.canvas.parentNode?.querySelector('div');
-
-  if (!tooltipEl) {
-    tooltipEl = document.createElement('div');
-    tooltipEl.style.background = 'rgba(0, 0, 0, 0.7)';
-    tooltipEl.style.borderRadius = '3px';
-    tooltipEl.style.color = 'white';
-    tooltipEl.style.opacity = '1';
-    tooltipEl.style.pointerEvents = 'none';
-    tooltipEl.style.position = 'absolute';
-    tooltipEl.style.transform = 'translate(-50%, 0)';
-    tooltipEl.style.transition = 'all .1s ease';
-
-    const div = document.createElement('div');
-	div.classList.add('tooltip-body');
-    
-    tooltipEl.appendChild(div);
-    chart.canvas.parentNode?.appendChild(tooltipEl);
+const initTooltip = (chart: Chart<'radar'>) => {
+  
+  if (!tooltipEl.value) {
+	let el = document.createElement('div');
+    el.style.opacity = '1';
+	el.style.padding = '0';
+    el.style.pointerEvents = 'none';
+    el.style.position = 'absolute';
+    el.style.transition = 'all .1s ease';
+	chart.canvas.parentNode?.appendChild(el);
+	tooltipEl.value = el;
   }
-
-  return tooltipEl;
 };
 
-const externalTooltipHandler = (context: {chart: Chart, tooltip: TooltipModel}) => {
+const externalTooltipHandler = (context: TooltipContext) => {
   // Tooltip Element
   const {chart, tooltip} = context;
-  const tooltipEl = getOrCreateTooltip(chart);
+  initTooltip(chart);
 
-  // Hide if no tooltip
-  if (tooltip.opacity === 0) {
-    tooltipEl.style.opacity = '0';
-    return;
-  }
-
-  const body = tooltipEl.querySelector('.tooltip-body');
-
-  if( !body ){
+  if( undefined == tooltipEl.value ){
 	return;
   }
 
-  body.innerHTML = '<h1>test</h1>';
-
+  // Hide if no tooltip
+  if (tooltip.opacity === 0) {
+    tooltipEl.value.style.opacity = '0';
+    return;
+  }
+//   body.innerHTML = '<h1>test</h1>';
+  
   const {offsetLeft: positionX, offsetTop: positionY} = chart.canvas;
   // Set Text
-  tooltipEl.style.opacity = '1';
-  tooltipEl.style.left = positionX + tooltip.caretX + 'px';
-  tooltipEl.style.top = positionY + tooltip.caretY + 'px';
-  tooltipEl.style.font = (tooltip.options.bodyFont as CanvasFontSpec).string;
-  tooltipEl.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
+  tooltipEl.value.style.opacity = '1';
+  tooltipEl.value.style.left = positionX + tooltip.caretX + 'px';
+  tooltipEl.value.style.top = positionY + tooltip.caretY + 'px';
+  tooltipEl.value.style.font = (tooltip.options.bodyFont as CanvasFontSpec).string;
+//   tooltipEl.value.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
 
-
+  tooltipContext.value = context;
 };
 
+const tooltipXY = computed(() => {
+	if( !tooltipContext.value ){
+		return ['',''];
+	}
+	const title = tooltipContext.value.tooltip.title.join(' ');
+	switch( true ){
+		case !!title.match(/greenhouse/i):
+			return ['center', 'bottom']
+		case !!title.match(/water\suse/i):
+			return ['right', 'center']
+		case !!title.match(/fossil/i):
+			return ['left', 'center']
+		default:
+			return ['center', 'top']
+	}
+})
+
+function pointBarStyle( point: any ){
+	return {
+		backgroundColor: point.dataset.borderColor,
+		width: (200 * (point.parsed.r / 10)) + 'px'
+	}
+}
 
 const options : ChartOptions = {
 	maintainAspectRatio: true,
@@ -115,8 +149,8 @@ const options : ChartOptions = {
 			display: false
 		},
 		tooltip: {
-			// enabled: false,
-			// external: externalTooltipHandler,
+			enabled: false,
+			external: externalTooltipHandler,
 			padding: 20,
 			backgroundColor: 'rgba(255,255,255,0.95)',
 			bodyColor: 'rgba(0,0,0,1)',
@@ -135,36 +169,36 @@ const options : ChartOptions = {
 			cornerRadius: 10,
 			usePointStyle: true,
 			boxPadding: 6,
-			xAlign: (context) => {
-				if( !context.tooltipItems.length ){
-					return;
-				}
-				const label = context.tooltipItems[0].label;
-				if( label == 'GREENHOUSE GAS EMISSIONS' || label == 'FRESHWATER EUTROPHICATION' ){
-					return 'center';
-				}
-				else if( label == 'WATER USE' ){
-					return 'left';
-				}
-				else {
-					return 'right';
-				}
-			},
-			yAlign: (context) => {
-				if( !context.tooltipItems.length ){
-					return;
-				}
-				const label = context.tooltipItems[0].label;
-				if( label == 'GREENHOUSE GAS EMISSIONS' ){
-					return 'top';
-				}
-				else if( label == 'FRESHWATER EUTROPHICATION' ){
-					return 'bottom';
-				}
-				else {
-					return 'center';
-				}
-			},
+			// xAlign: (context) => {
+			// 	if( !context.tooltipItems.length ){
+			// 		return;
+			// 	}
+			// 	const label = context.tooltipItems[0].label;
+			// 	if( label == 'GREENHOUSE GAS EMISSIONS' || label == 'FRESHWATER EUTROPHICATION' ){
+			// 		return 'center';
+			// 	}
+			// 	else if( label == 'WATER USE' ){
+			// 		return 'left';
+			// 	}
+			// 	else {
+			// 		return 'right';
+			// 	}
+			// },
+			// yAlign: (context) => {
+			// 	if( !context.tooltipItems.length ){
+			// 		return;
+			// 	}
+			// 	const label = context.tooltipItems[0].label;
+			// 	if( label == 'GREENHOUSE GAS EMISSIONS' ){
+			// 		return 'top';
+			// 	}
+			// 	else if( label == 'FRESHWATER EUTROPHICATION' ){
+			// 		return 'bottom';
+			// 	}
+			// 	else {
+			// 		return 'center';
+			// 	}
+			// },
 			callbacks: {
 				labelPointStyle: (context) => {
 					return {
@@ -261,6 +295,32 @@ const data = computed( () => {
 </script>
 
 <!-- SCSS Style -->
-<style lang="scss">
+<style lang="scss" scoped>
+.tooltip-body {
+	padding: 20px;
+	background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+	// transition: 0.2s all;
+	h4 {
+		font-size: 1rem;
+		font-weight: 500;
+	}
+	&.x-right.y-center {
+		transform: translateX(0) translateY(-50%);
+	}
+	&.x-left.y-center {
+		transform: translateX(-100%) translateY(-50%);
+	}
+	&.x-center.y-bottom {
+		transform: translateX(-50%) translateY(0%);
+	}
+	&.x-center.y-top {
+		transform: translateX(-50%) translateY(-100%);
+	}
+}
 
+.point-bar {
+	height: 14px;
+}
 </style>

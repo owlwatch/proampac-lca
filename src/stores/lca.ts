@@ -1,5 +1,6 @@
 import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
+import {marked} from 'marked';
 import type { LcaDataRow, LcaDataRowList } from "@/types/lca";
 
 export const useLcaStore = defineStore("lca", () => {
@@ -7,7 +8,8 @@ export const useLcaStore = defineStore("lca", () => {
 	const material = ref<LcaDataRow>();
 	const allMarketData = ref<Array<{[key:string]:string}>>([]);
 	const allMaterials = ref<LcaDataRowList>([]);
-	const allAnalysis = ref<Array<{[key:string]:string}>>([])
+	const allAnalysis = ref<Array<{[key:string]:string}>>([]);
+	const allLang = ref<{[key:string]:string}>({});
 
 	const markets = computed(()=>{
 		const values: string[] = [];
@@ -67,6 +69,17 @@ export const useLcaStore = defineStore("lca", () => {
 			return row['Market'] == market.value
 		});
 	});
+
+	function lang(key:string, defaultValue: string = '', markdown: boolean = false){
+		let v = allLang.value[key];
+		if( !v ){
+			return defaultValue;
+		}
+		if( markdown ){
+			v = marked.parse( v );
+		}
+		return v;
+	};
 
 	function parseMaterialsJson(rows: Array<Array<string>>){
 
@@ -140,6 +153,15 @@ export const useLcaStore = defineStore("lca", () => {
 		});
 	}
 
+	function parseGlobal(rows: Array<Array<string>> ){
+
+		allLang.value = {};
+
+		rows.forEach( (row: Array<string>) => {
+			allLang.value[row[0]] = row[1];
+		});
+	}
+
 	async function loadLcaData(sheetId: string, apiKey: string) {
 		
 		const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchGet`;
@@ -149,7 +171,8 @@ export const useLcaStore = defineStore("lca", () => {
 				"key=" + apiKey,
 				"ranges=" + encodeURIComponent('Materials Data'),
 				"ranges=" + encodeURIComponent('Markets'),
-				"ranges=" + encodeURIComponent('In Depth Analysis')
+				"ranges=" + encodeURIComponent('In Depth Analysis'),
+				"ranges=" + encodeURIComponent('Global')
 			].join('&'));
 
 			const json = await data.json();
@@ -157,6 +180,7 @@ export const useLcaStore = defineStore("lca", () => {
 			parseMaterialsJson(json.valueRanges[0].values);
 			parseMarketsJson(json.valueRanges[1].values);
 			parseAnalysis( json.valueRanges[2].values );
+			parseGlobal( json.valueRanges[3].values );
 			
 			if( markets.value.length ){
 				market.value = markets.value[0];
@@ -181,6 +205,8 @@ export const useLcaStore = defineStore("lca", () => {
 		baselineMaterial,
 		allMaterials,
 		allAnalysis,
+		allLang,
+		lang,
 		materials,
 		materialsForComparison,
 		markets,
