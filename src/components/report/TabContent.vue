@@ -57,6 +57,7 @@
 
                             span.ms-2.fas.fa-circle-question.tooltip-icon(
                                 data-tooltip
+                                data-bs-custom-class="text-wrap"
                                 v-if="lang( stat.tooltip )"
                                 data-bs-html="false"
                                 :data-bs-title="lang( stat.tooltip )"
