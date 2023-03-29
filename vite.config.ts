@@ -1,4 +1,5 @@
 import { fileURLToPath, URL } from "node:url";
+import { resolve } from 'path';
 
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
@@ -14,6 +15,13 @@ export default defineConfig({
       }
     })
   ],
+  // build: {
+  //   lib: {
+  //     entry: 'src/main.ce.ts',
+  //     name: 'Proampac LCA',
+  //     fileName: 'proampac-lca'
+  //   }
+  // },
   define: {
     'process.env': process.env
   },

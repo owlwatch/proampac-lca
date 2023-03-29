@@ -1,6 +1,40 @@
-# proampac-lca
+# ProAmpac LCA
 
-This template should help get you started developing with Vue 3 in Vite.
+The ProAmpac LCA tool is an interactive data visualization. It can be added to a page by including a javascript file, a stylesheet, and then adding some `<div>` elements that will be populated with their corresponding interface elements.
+
+## Installation
+
+The javascript and stylesheet files to be included can be found in the `dist` directory. They include a hash in the filename. Include these on the page (it shouldn't matter if its in the `head` or `body`).
+
+The `div` containers available are:
+
+## `proampac-lca-report` 
+
+This is the primary component that renders the main content. You need to provide it the Google Sheet ID and Api Key.
+
+### Example
+
+```
+<div data-proampac-component="proampac-lca-report"
+    data-google-sheet-id="google_sheet_id"
+    data-google-api-key="google_api_key"
+></div>
+```
+
+## `proampac-lca-selector`
+
+This element renders the dropdown that allows a user to select the 
+
+### Example
+```
+<div data-proampac-component="proampac-lca-selector"></div>
+``` 
+
+> **Note**
+> The rest of this README is for developers, and basically just the
+> boilerplate documentation for vite apps.
+>
+> You can use Gitpod.io for a no-muss-no-fuss dev environment
 
 ## Recommended IDE Setup
 
