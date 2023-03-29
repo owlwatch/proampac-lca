@@ -71,7 +71,8 @@ This element renders the dropdown that allows a user to select the
   -------------------------->
   ```
 
-> **Note**
+> **Note**  
+> 
 > The rest of this README is for developers, and basically just the
 > boilerplate documentation for vite apps.
 >
