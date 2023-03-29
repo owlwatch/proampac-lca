@@ -30,7 +30,9 @@ This element renders the dropdown that allows a user to select the
 <div data-proampac-component="proampac-lca-selector"></div>
 ``` 
 
-> **Note**
+___
+> **Note**  
+> 
 > The rest of this README is for developers, and basically just the
 > boilerplate documentation for vite apps.
 >
