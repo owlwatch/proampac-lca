@@ -70,6 +70,7 @@ This element renders the dropdown that allows a user to select the
     End Demo Area
   -------------------------->
   ```
+___
 
 > **Note**  
 > 
