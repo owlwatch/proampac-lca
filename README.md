@@ -30,6 +30,47 @@ This element renders the dropdown that allows a user to select the
 <div data-proampac-component="proampac-lca-selector"></div>
 ``` 
 
+
+## Example from the demo:
+```html
+<!-- you can include these in the head -->
+<script type="module" crossorigin src="./assets/index-9442cd30.js"></script>
+<link rel="stylesheet" href="./assets/index-81093a18.css">
+
+ <!------------------------
+    Begin Demo Area
+  -------------------------->
+  <section class="hero background-image green" style="background-image: url(https://dev.weareturnstyle.com/proampac/new/images/bg-hero-sustainability-leaves.jpg);">
+    <div class="content row align-items-center justify-content-center">
+      <div class="col-sm-12 col-md-10 col-lg-8 text-center">
+        <div class="description text-center">
+          <h1>Using ProActive CHART™ to Help Reach Sustainability Goals</h1>
+          <p class="mb-5">
+            Reaching sustainability goals can be a challenge. 
+            ProAmpac is here to help you understand pathways to success.
+            No matter what your goal is, we will work hard to guide you to it.
+            Our ProActive Chart™ Life Cycle analysis tool will help you gain a 
+            baseline for your current product and packaging formats as well as 
+            gain further business insights into how products can play a role in the circular economy.
+          </p>
+          <div data-proampac-component="proampac-lca-selector">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="intro">
+    <div data-proampac-component="proampac-lca-report"
+      data-google-sheet-id="1_D53QXT0PlRs8rdFza9Wmr69MZCIlnylztEBLa7nLQo"
+      data-google-api-key="AIzaSyBlZSpbxCoJ4Af3vPHE7qDp_TZzdzKc3As"
+    ></div>
+  </section>
+  <!------------------------
+    End Demo Area
+  -------------------------->
+  ```
+
 > **Note**
 > The rest of this README is for developers, and basically just the
 > boilerplate documentation for vite apps.
