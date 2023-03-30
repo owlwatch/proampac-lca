@@ -109,7 +109,7 @@ const tabs = [
 		"key": 'ghg',
 		"title": "Greenhouse Gas Emissions",
 		"titleHTML": "Greenhouse Gas<br />Emissions",
-		"comparisonString" : " emits <strong> $percent less Greenhouse Gass</strong> than the ",
+		"comparisonString" : " emits <strong> $percent less Greenhouse Gas</strong> than the ",
 		"icon": IconGhg,
 		"content": TabContent
 	},
