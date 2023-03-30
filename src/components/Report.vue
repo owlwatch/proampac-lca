@@ -109,7 +109,11 @@ const tabs = [
 		"key": 'ghg',
 		"title": "Greenhouse Gas Emissions",
 		"titleHTML": "Greenhouse Gas<br />Emissions",
-		"comparisonString" : " emits <strong> $percent less Greenhouse Gas</strong> than the ",
+		"comparisonString" : computed( () => " " + lang(
+			'Compare Greenhouse Gas Emissions', 
+			"emits <strong> $percent less Greenhouse Gas</strong> than the", 
+			true, true
+		)+" "),
 		"icon": IconGhg,
 		"content": TabContent
 	},
@@ -117,7 +121,11 @@ const tabs = [
 		"key": 'fossil-fuel',
 		"title": "Fossil Fuel Usage",
 		"titleHTML": "Fossil Fuel<br />Use",
-		"comparisonString" : " uses <strong> $percent less fossil fuels</strong> than the ",
+		"comparisonString" : computed(() => " " + lang(
+			'Compare Fossil Fuel Usage', 
+			"uses <strong> $percent less fossil fuels</strong> than the",
+			true, true
+		)+" "),
 		"icon": IconFossilFuel,
 		"content": TabFossilFuel
 	},
@@ -125,7 +133,11 @@ const tabs = [
 		"key": 'water-use',
 		"title": "Water Use",
 		"titleHTML": "Water<br /> Use",
-		"comparisonString" : " uses <strong> $percent less water</strong> than the ",
+		"comparisonString" : computed(  () => " " + lang(
+			'Compare Water use', 
+			"uses <strong> $percent less water</strong> than the",
+			true, true
+		)+" "),
 		"icon": IconWaterUse,
 		"content": TabContent
 	},
@@ -133,7 +145,11 @@ const tabs = [
 		"key": 'freshwater-eutrophication',
 		"title": "Freshwater Eutrophication",
 		"titleHTML": "Freshwater<br />Eutrophication",
-		"comparisonString" : " <strong>has $percent less impact on the freshwater supply</strong> than the ",
+		"comparisonString" : computed(() => " " + lang(
+			'Compare Freshwater Eutrophication', 
+			"<strong>has $percent less impact on the freshwater supply</strong> than the",
+			true, true
+		)+" "),
 		"icon": IconFreshwaterEutrophication,
 		"content": TabContent
 	}

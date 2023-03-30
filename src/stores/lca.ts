@@ -70,13 +70,18 @@ export const useLcaStore = defineStore("lca", () => {
 		});
 	});
 
-	function lang(key:string, defaultValue: string = '', markdown: boolean = false){
+	function lang(key:string, defaultValue: string = '', markdown: boolean = false, inline:boolean = false){
 		let v = allLang.value[key];
 		if( !v ){
 			return defaultValue;
 		}
 		if( markdown ){
-			v = marked.parse( v );
+			if( inline ){
+				v = marked.parseInline( v );
+			}
+			else {
+				v = marked.parse( v );
+			}
 		}
 		return v;
 	};

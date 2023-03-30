@@ -138,7 +138,7 @@ const reduction = computed( () => {
 });
 
 const comparisonString = computed( () => {
-    return tab.value.comparisonString.replace(/\$percent/, String(reduction.value)+'%')+' '+ baselineMaterial.value.Core_Data.Material;
+    return tab.value.comparisonString.value.replace(/\$percent/, String(reduction.value)+'%')+' '+ baselineMaterial.value.Core_Data.Material;
 });
 
 const selectedMaterial = computed( {
