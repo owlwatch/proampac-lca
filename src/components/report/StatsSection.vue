@@ -60,8 +60,8 @@ const stats = computed( () => {
             return;
         }
         // see if all materials have a value
-        if( !materials.value.every( material => {
-            return material.Optional_Data[key] != '';
+        if( materials.value.every( material => {
+            return !material.Optional_Data[key] || material.Optional_Data[key] == '';
         }) ){
             return;
         }
@@ -71,7 +71,7 @@ const stats = computed( () => {
                 return material.Optional_Data[key];
             }))].length !== materials.value.length
         ){
-            return;
+            // return;
         }
         sections.push({
             title: key.replace('(g)', '(<span class="text-lowercase">g</span>)'),

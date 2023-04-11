@@ -31,7 +31,7 @@ const minMax = computed(() => {
 
     const range = getRange(values);
     return {min: range[0], max: range[1]};
-})
+});
 
 function getRange(numbers:Array<number>){
     const max = Math.max(...numbers);

@@ -71,7 +71,7 @@
                             v-for="stat in stats"
                         )
                             .stat-bar(
-                                :style="{ backgroundColor: stat.color, width: String(getStatPercent( material, stat.title ))+'%' }"
+                                :style="{ backgroundColor: stat.color, width: String(getStatBarPercent( material, stat.title ))+'%' }"
                                 title=""
                             ) 
                                 span {{ getStatPercent( material, stat.title) }}
@@ -91,15 +91,6 @@ import { Tooltip } from 'bootstrap'
 
 const store = useLcaStore();
 const lang = store.lang;
-
-const getStatPercent = function( material:any, title:string){
-    const all = material[tab.value.title.replace(/\s/,'_')];
-    const total = Object.keys(all).reduce( (total, v) => {
-        return total + Number(all[v].replace(/[^\d\.]/gi, ''));
-    }, 0);
-    const v = Number(all[title].replace(/[^\d\.]/gi, ''));
-    return (v / total) * 100;
-}
 
 const props = defineProps<{
     tab: {[k:string]: any}
@@ -125,6 +116,54 @@ const stats = [{
 
 const {tab} = toRefs(props);
 const {analysis, materialsForComparison, material, materials, baselineMaterial} = storeToRefs(store);
+
+
+const minMax = (values:number[]) => {
+    const range = getRange(values);
+    return {min: range[0], max: range[1]};
+};
+
+function getRange(numbers:Array<number>){
+    const max = Math.max(...numbers);
+    const min = Math.min(...numbers);
+
+    const range = max-min;
+
+    const diff = range * 0.55;
+    return [min-diff, max+diff];
+}
+
+function getStatBarPercent( material:any, title:string ){
+
+    // lets get all the materials for this
+    const tabKey = tab.value.title.replace(/\s/,'_');
+    const values = materials.value.map( m => Number(
+        m[tabKey][title].replace(/[^\d\.]/gi,'')
+    ));
+
+    const mm = minMax(values);
+
+    if( mm.min == mm.max ){
+        return 50;
+    }
+
+    const v = Number( material[tabKey][title].replace(/[^\d\.]/gi,'') );
+    const p = (v - mm.min) / (mm.max - mm.min);
+
+    return Number.isNaN(p) ? 10 : (p * 100);
+}
+
+const getStatPercent = function( material:any, title:string ){
+
+    // lets get all the materials for this
+    
+    const all = material[tab.value.title.replace(/\s/,'_')];
+    const total = Object.keys(all).reduce( (total, v) => {
+        return total + Number(all[v].replace(/[^\d\.]/gi, ''));
+    }, 0);
+    const v = Number(all[title].replace(/[^\d\.]/gi, ''));
+    return (v / total) * 100;
+}
 
 // get the percent
 const reduction = computed( () => {
