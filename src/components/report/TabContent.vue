@@ -40,7 +40,7 @@
         p(
             v-if="analysis && analysis[tab.title] && analysis[tab.title].market"
         )
-            strong {{ analysis[tab.title].market }}
+            strong(v-html="analysis[tab.title].market")
         
         .horizontal-scroller
             // lets go through each of these
@@ -52,14 +52,14 @@
                             v-for="stat in stats"
                         ) 
                             span(
-                                
-                            ) {{ stat.title }}
+                                v-html="stat.title"
+                            )
 
                             span.ms-2.fas.fa-circle-question.tooltip-icon(
                                 data-tooltip
                                 data-bs-custom-class="text-wrap"
                                 v-if="lang( stat.tooltip )"
-                                data-bs-html="false"
+                                data-bs-html="true"
                                 :data-bs-title="lang( stat.tooltip )"
                             )
                 tbody

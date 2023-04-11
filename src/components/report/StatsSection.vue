@@ -4,7 +4,7 @@
     section.stat-section(
         v-for="section of stats"
     )
-        h6.lca-heading {{ section.title }}
+        h6.lca-heading(v-html="section.title")
 
         template(v-if="barCharts.includes(section.title)")
             bar-chart(
@@ -74,7 +74,7 @@ const stats = computed( () => {
             return;
         }
         sections.push({
-            title: key,
+            title: key.replace('(g)', '(<span class="text-lowercase">g</span>)'),
             items: materials.value.map( material => {
                 return {
                     material,
